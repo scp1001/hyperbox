@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Contact V19</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+<!--===============================================================================================-->
+
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<script type="text/javascript" language="javascript">
+	function call() {
+	var msg   = $('#code').serialize();
+		$.ajax({
+			// Метод передачи
+			type: 'POST',
+			 // Файл которому передаем запрос и получаем ответ
+			url: '/hyperbox.php',
+			 // Кеширование
+			cache: false,
+			 // Верямя ожидания ответа, в мили секундах 1000 мс = 1 сек
+			timeout:3000,
+			data: msg,
+			// Функция сработает при успешном получении данных
+			success: function(data) {
+				// Отображаем данные в форме
+				$('#results').html(data);
+				alert('kuku');
+			},
+			// Функция срабатывает в период ожидания данных
+			beforeSend: function(data) { 
+				$('#results').html('<p>Ожидание данных...</p>');
+			},
+			 // Тип данных
+			dataType:"html",
+			 // Функция сработает в случае ошибки
+			error:  function(data){
+				$('#results').html('<p>Возникла неизвестная ошибка. Пожалуйста, попробуйте чуть позже...</p>');
+				alert('kuku');	
+				}
+			});
+		}
+</script>
+
+<body>
+
+<div class="wrap-contact100">
+			<form class="contact100-form validate-form"  action="javascript:void(null);" onsubmit="call()">
+				<span class="contact100-form-title">
+				<img src = "tesseract.gif" style="margin-left: -7px;"></img>	Hyperbox: a symbolic execution VM for Waves smart-contracts
+				</span>
+
+				<div class="wrap-input100 validate-input">				
+					<input id="email" class="input100" type="text" name="email" placeholder="Initial State (It will be filled with zeros if empty). Example: 1,2,3,4">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input">
+					<textarea id="code" class="input100" name="message" placeholder="RIDE contract code"></textarea>
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="container-contact100-form-btn">
+					<button class="contact100-form-btn">
+						Solve
+					</button>
+					<p></p>
+				</div>
+			</form>
+		</div>
+
+</body>
+</html>

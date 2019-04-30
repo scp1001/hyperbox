@@ -1,0 +1,62 @@
+let aliceAddr=Address(base58'3MxMizNF28ixyg1Pvuxi2afcAPpsBgKzjUu')
+let bobAddr=Address(base58'3NBwn3NZBAAZpdAFmnshDmTtXSVWRPGGP1B')
+let contract = tx.sender
+ let cell1= extract(getInteger(contract,"cell1"))
+ let cell2= extract(getInteger(contract,"cell2"))
+ let cell3= extract(getInteger(contract,"cell3"))
+ let cell4= extract(getInteger(contract,"cell4"))
+ let cell5= extract(getInteger(contract,"cell5"))
+ let cell6= extract(getInteger(contract,"cell6"))
+ let cell7= extract(getInteger(contract,"cell7"))
+ let cell8= extract(getInteger(contract,"cell8"))
+ let cell9= extract(getInteger(contract,"cell9"))
+ let line1= cell1 + cell2 + cell3
+ let line2= cell4 + cell5 + cell6
+ let line3= cell7 + cell8 + cell9
+ let column1= cell1 + cell4 + cell7
+ let column2= cell2 + cell5 + cell8
+ let column3= cell3 + cell6 + cell9
+ let diagonal1= cell1 + cell5 + cell9
+ let diagonal2= cell3 + cell5 + cell7
+ let all = line1 + line2 + line3
+ let crossNum= all % 10
+ let zeroNum= (all-crossNum) / 10
+
+ let crossWin= (line1 == 3 || line2 == 3 || line3 == 3 || column1 == 3 || column2 == 3 || column3 == 3||
+ diagonal1 == 3 || diagonal2 == 3)
+
+ let zeroWin= (line1 == 30 || line2 == 30 || line3 == 30 || column1 == 30 || column2 == 30 || column3 == 30 || diagonal1 == 30 || diagonal2 == 30)
+
+ let draw = (crossNum + zeroNum == 9) && !crossWin && !zeroWin
+match tx {
+case t:DataTransaction =>
+ let dataSize = size(t.data)
+ let cellKey= t.data[0].key
+ let deadlineKey= t.data[1].key
+ let cellValue= extract(t.data[0].value)
+ let cell = extract(getInteger(contract,cellKey))
+ let inputCorrect = (cellKey == "cell1" || cellKey == "cell2" || cellKey == "cell3" || cellKey == "cell4" || cellKey == "cell5" || cellKey == "cell6" || cellKey == "cell7" || cellKey == "cell8" || cellKey == "cell9") && deadlineKey == "deadline" && dataSize == 2 && cell == 0
+
+ let inputSigned = inputCorrect && (cellValue == 1 && sigVerify(tx.bodyBytes,tx.proofs[0],base58'9Uwm4USQebE9vFi7o2e4U7XAkmPR6kXTAcppL4bAY9AV') && crossNum == zeroNum) || (cellValue == 10 && sigVerify(tx.bodyBytes,tx.proofs[0],base58'FkqPh5Yunp329Juap56F1zaKn7UPxbLE6KVaPHowxx3b') && crossNum > zeroNum)
+
+ let deadline= extract(getInteger(t.data, "deadline"))
+
+ let deadlineCorrect= deadline >= height + 4 && deadline <= height + 6
+
+ let gameFinished= crossWin || zeroWin || draw
+
+ (inputSigned && deadlineCorrect && !gameFinished ) || (dataSize == 9 )
+case s:TransferTransaction =>
+ let win = ((s.recipient == aliceAddr && crossWin) || (s.recipient == bobAddr && zeroWin))
+ let deadline1= extract(getInteger(contract,"deadline"))
+ let timeout = (crossNum > zeroNum && height > deadline1 && s.recipient == aliceAddr) || (crossNum == zeroNum && height > deadline1 && s.recipient == bobAddr)
+
+ win || timeout && s.amount >= 10000000 && s.fee <= 1000000
+
+case v:MassTransferTransaction =>
+ let aliceTx= v.transfers[0]
+ let bobTx= v.transfers[1]
+ draw && aliceTx.recipient == aliceAddr && bobTx.recipient == bobAddr && aliceTx.amount == bobTx.amount && aliceTx.amount >= 10000000 && v.fee <= 1000000
+
+case _ => true
+}

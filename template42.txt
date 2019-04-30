@@ -1,0 +1,60 @@
+
+
+import json
+
+from z3 import *
+
+s = Solver()
+
+  
+  
+    
+Steps=7
+Num= Steps+1
+
+$code$
+
+
+
+#template, only start rest
+s.add(data + start)
+
+#template
+s.add(final)
+
+
+
+
+ind = 0
+
+f = open("/var/www/html/all/bin/python/log.txt", "a")
+
+
+
+while s.check() == sat:
+  ind = ind +1
+  
+
+  print ind
+  m = s.model()
+  print m
+
+  print "traversing model..." 
+  #for d in m.decls():
+	#print "%s = %s" % (d.name(), m[d])
+
+  
+ 
+  f.write(str(m))
+  f.write("\n\n")
+  exit()
+  #s.add(Or(goat[0] != s.model()[data[0]] )) # prevent next model from using the same assignment as a previous model
+
+
+
+print "Total solution number: "
+print ind  
+
+f.close()
+ 
+

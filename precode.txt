@@ -1,0 +1,41 @@
+let contract = tx.sender
+let a = extract(getInteger(contract,"human"))
+let wolf= extract(getInteger(contract,"wolf"))
+let golf= extract(getInteger(contract,"goat"))
+let cabbage= extract(getInteger(contract,"cabbage"))
+
+match tx {
+case t:DataTransaction =>
+   let newHuman = extract(getInteger(t.data,"human")) 
+   let krot = extract(getInteger(t.data, "wolf"))
+   let newGoat= extract(getInteger(t.data, "goat"))
+   let newCabbage= extract(getInteger(t.data,"cabbage"))
+   
+   let humanSide= a == 0 || a == 1
+   let wolfSide= wolf == 0 || wolf == 1
+   let golfSide= golf == 0 || golf == 1
+   let cabbageSide= cabbage == 0 || cabbage == 1
+   let side= humanSide && wolfSide && golfSide && cabbageSide
+
+   let safeAlone= newGoat != krot && newGoat != newCabbage
+   let safe= safeAlone || newGoat == newHuman
+   let humanTravel= a != newHuman 
+
+   let t1= humanTravel && krot == wolf + 1 && newGoat == golf && newCabbage == cabbage 
+   let t2= humanTravel && krot == wolf && newGoat == golf + 1 && newCabbage == cabbage
+   let t3= humanTravel && krot == wolf && newGoat == golf && newCabbage == cabbage + 1
+   let t4= humanTravel && krot == wolf - 1 && newGoat == golf && newCabbage == cabbage
+   let t5= humanTravel && krot == wolf && newGoat == golf - 1 && newCabbage == cabbage
+   let t6= humanTravel && krot == wolf && newGoat == golf && newCabbage == cabbage - 1
+   let t7= humanTravel && krot == wolf && newGoat == golf && newCabbage == cabbage
+   let objectTravel = t1 || t2 || t3 || t4 || t5 || t6 || t7
+   
+   side && safe && humanTravel && objectTravel
+case s:TransferTransaction =>
+   let first = a == 1 && wolf == 1
+   let second = golf == 1 && cabbage == 1
+   first && second
+
+case _ => true
+
+}

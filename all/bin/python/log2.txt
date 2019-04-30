@@ -1,0 +1,10 @@
+[cell9 = 1,
+ cell8 = 10,
+ cell7 = 0,
+ cell6 = 0,
+ cell5 = 1,
+ cell4 = 0,
+ cell3 = 10,
+ cell2 = 10,
+ cell1 = 0]
+

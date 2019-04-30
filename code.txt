@@ -1,0 +1,33 @@
+ let contract= tx.sender 
+ let human= extract ( getInteger ( contract , "human" ) ) 
+ let wolf= extract ( getInteger ( contract , "wolf" ) ) 
+ let goat= extract ( getInteger ( contract , "goat" ) ) 
+ let cabbage= extract ( getInteger ( contract , "cabbage" ) ) 
+ matchtx { 
+ caset:DataTransaction => 
+ let newHuman= extract ( getInteger ( t.data , "human" ) ) 
+ let newWolf= extract ( getInteger ( t.data , "wolf" ) ) 
+ let newGoat= extract ( getInteger ( t.data , "goat" ) ) 
+ let newCabbage= extract ( getInteger ( t.data , "cabbage" ) ) 
+ let humanSide= human == 0 || human == 1 
+ let wolfSide= wolf == 0 || wolf == 1 
+ let goatSide= goat == 0 || goat == 1 
+ let cabbageSide= cabbage == 0 || cabbage == 1 
+ let side= humanSide && wolfSide && goatSide && cabbageSide 
+ let safeAlone= newGoat != newWolf && newGoat != newCabbage 
+ let safe= safeAlone || newGoat == newHuman 
+ let humanTravel= human != newHuman 
+ let t1= humanTravel && newWolf == wolf + 1 && newGoat == goat && newCabbage == cabbage 
+ let t2= humanTravel && newWolf == wolf && newGoat == goat + 1 && newCabbage == cabbage 
+ let t3= humanTravel && newWolf == wolf && newGoat == goat && newCabbage == cabbage + 1 
+ let t4= humanTravel && newWolf == wolf - 1 && newGoat == goat && newCabbage == cabbage 
+ let t5= humanTravel && newWolf == wolf && newGoat == goat - 1 && newCabbage == cabbage 
+ let t6= humanTravel && newWolf == wolf && newGoat == goat && newCabbage == cabbage - 1 
+ let t7= humanTravel && newWolf == wolf && newGoat == goat && newCabbage == cabbage 
+ let objectTravel= t1 || t2 || t3 || t4 || t5 || t6 || t7 
+ side && safe && humanTravel && objectTravel 
+ cases:TransferTransaction => 
+ let fState= human == 1 && wolf == 1 && goat == 1 && cabbage == 1
+ fState 
+ case_ => false 
+ } 

@@ -1,0 +1,2 @@
+"1,1,1,1"
+final= [ human[1] == 1, wolf[1] == 0, goat[1] == 1, cabbage[1] == 0 ]

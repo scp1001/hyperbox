@@ -1,0 +1,23 @@
+fState:  And( And( And( human[Steps]  ==  1 , wolf[Steps]  ==  1 )  , goat[Steps]  ==  1 )  , cabbage[Steps]  ==  1 )  
+final:  fState[Steps] 
+fState:   
+wolf:   
+goat:   
+cabbage:   
+cabbageSide:  Or( cabbage[i]  ==  0 , cabbage[i]  ==  1 )  
+goatSide:  Or( goat[i]  ==  0 , goat[i]  ==  1 )  
+humanSide:  Or( human[i]  ==  0 , human[i]  ==  1 )  
+t7:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] )  , goat[i+1]  ==  goat[i] )  , cabbage  ==  cabbage[i] )  
+t3:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] )  , goat[i+1]  ==  goat[i] )  , cabbage  ==  cabbage[i] + 1 )  
+t6:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] )  , goat[i+1]  ==  goat[i] )  , cabbage  ==  cabbage[i] - 1 )  
+t2:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] )  , goat[i+1]  ==  goat[i] + 1 )  , cabbage  ==  cabbage[i] )  
+t5:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] )  , goat[i+1]  ==  goat[i] - 1 )  , cabbage  ==  cabbage[i] )  
+t1:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] + 1 )  , goat[i+1]  ==  goat[i] )  , cabbage  ==  cabbage[i] )  
+t4:  And( And( And( humanTravel[i] , wolf  ==  wolf[i] - 1 )  , goat[i+1]  ==  goat[i] )  , cabbage  ==  cabbage[i] )  
+safeAlone:  And( goat[i+1] != wolf , goat[i+1] != cabbage )  
+wolfSide:  Or( wolf[i]  ==  0 , wolf[i]  ==  1 )  
+humanTravel:  human[i] != human[i+1] 
+side:  And( And( And( humanSide[i] , wolfSide[i] )  , goatSide[i] )  , cabbageSide[i] )  
+safe:  Or( safeAlone[i] , goat[i+1]  ==  human[i+1] )  
+objectTravel:  Or( Or( Or( Or( Or( Or( t1[i] , t2[i] )  , t3[i] )  , t4[i] )  , t5[i] )  , t6[i] )  , t7[i] )  
+data:  And( And( And( side[i] , safe[i] )  , humanTravel[i] )  , objectTravel[i] )  

@@ -1,0 +1,22 @@
+let contract = tx.sender
+let a= extract(getInteger(contract,"a"))
+let b= extract(getInteger(contract,"b"))
+let c= extract(getInteger(contract,"c"))
+let d= extract(getInteger(contract,"d"))
+
+match tx {
+case t:DataTransaction =>
+let na= extract(getInteger(t.data,"a")) 
+let nb= extract(getInteger(t.data,"b"))
+let nc= extract(getInteger(t.data,"c"))
+let nd= extract(getInteger(t.data,"d"))
+let ne= 1
+   
+   nb > na
+case s:TransferTransaction =>
+   # 5 + 10 - 3 / 2 == 12
+   ( a + b - c ) / d == 12
+
+case _ => true
+
+}

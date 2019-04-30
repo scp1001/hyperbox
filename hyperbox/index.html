@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Hyperbox</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+<!--===============================================================================================-->
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+<script type="text/javascript" language="javascript">
+	function call(type) {
+	var msg   = $('#form1').serialize();
+	//var stp   = $('#stp').serialize();
+		$.ajax({
+			
+			type: 'POST',
+			
+			url: '/hyperbox.php?type=' + type,
+			
+			cache: false,
+			
+			timeout:5000,
+			data: msg,
+		
+			success: function(data) {
+				
+				if(data.indexOf('granted') + 1) { 
+					 var dtx=$('#tdata').val();
+					$('#startState').val(dtx);
+				}
+				$('#steps').html(data);
+			},
+		
+			beforeSend: function(data) { 
+				$('#results').html('<p>Waiting...</p>');
+			},
+			
+			dataType:"html",
+			 
+			error:  function(data){
+				$('#results').html('<p>Unknown error.</p>');
+				alert('Hyperbox didnt send response. Try to reduce depth and check your network connection.');
+				}
+			});
+		}
+		</script>
+
+<div class="wrap-contact100">
+			<form id="form1" class="contact100-form validate-form" >
+				<span class="contact100-form-title">
+				<img src = "tesseract.gif" style="margin-left: -10px;"></img>	Hyperbox: a symbolic execution VM for Waves smart-contracts
+				</span>
+				<span>Contract initial state</span>
+				<div class="wrap-input100 validate-input">				
+					<input id="startState" class="input100" type="text" name="startState" value="0,0,0,0" placeholder="Initial State (It will be filled with zeros if empty). Example: 1,2,3,4">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input">
+					<textarea id="code" class="input100" name="message" placeholder="RIDE contract code" style="height: 300px;" value="">
+let contract = tx.sender
+let human= extract(getInteger(contract,&#x22;human&#x22;))
+let wolf= extract(getInteger(contract,&#x22;wolf&#x22;))
+let goat= extract(getInteger(contract,&#x22;goat&#x22;))
+let cabbage= extract(getInteger(contract,&#x22;cabbage&#x22;))
+
+match tx {
+case t:DataTransaction =&#x3E;
+   let newHuman= extract(getInteger(t.data,&#x22;human&#x22;)) 
+   let newWolf= extract(getInteger(t.data,&#x22;wolf&#x22;))
+   let newGoat= extract(getInteger(t.data,&#x22;goat&#x22;))
+   let newCabbage= extract(getInteger(t.data,&#x22;cabbage&#x22;))
+   
+   let humanSide= human == 0 || human == 1
+   let wolfSide= wolf == 0 || wolf == 1
+   let goatSide= goat == 0 || goat == 1
+   let cabbageSide= cabbage == 0 || cabbage == 1
+   let side= humanSide &#x26;&#x26; wolfSide &#x26;&#x26; goatSide &#x26;&#x26; cabbageSide
+
+   let safeAlone= newGoat != newWolf &#x26;&#x26; newGoat != newCabbage
+   let safe= safeAlone || newGoat == newHuman
+   let humanTravel= human != newHuman 
+
+   let t1= humanTravel &#x26;&#x26; newWolf == wolf + 1 &#x26;&#x26; newGoat == goat &#x26;&#x26; newCabbage == cabbage 
+   let t2= humanTravel &#x26;&#x26; newWolf == wolf &#x26;&#x26; newGoat == goat + 1 &#x26;&#x26; newCabbage == cabbage
+   let t3= humanTravel &#x26;&#x26; newWolf == wolf &#x26;&#x26; newGoat == goat &#x26;&#x26; newCabbage == cabbage + 1
+   let t4= humanTravel &#x26;&#x26; newWolf == wolf - 1 &#x26;&#x26; newGoat == goat &#x26;&#x26; newCabbage == cabbage
+   let t5= humanTravel &#x26;&#x26; newWolf == wolf &#x26;&#x26; newGoat == goat - 1 &#x26;&#x26; newCabbage == cabbage
+   let t6= humanTravel &#x26;&#x26; newWolf == wolf &#x26;&#x26; newGoat == goat &#x26;&#x26; newCabbage == cabbage - 1
+   let t7= humanTravel &#x26;&#x26; newWolf == wolf &#x26;&#x26; newGoat == goat &#x26;&#x26; newCabbage == cabbage
+   let objectTravel = t1 || t2 || t3 || t4 || t5 || t6 || t7
+   
+   side &#x26;&#x26; safe &#x26;&#x26; humanTravel &#x26;&#x26; objectTravel
+case s:TransferTransaction =&#x3E;
+human == 1 &#x26;&#x26; wolf == 1 &#x26;&#x26; goat == 1 &#x26;&#x26; cabbage == 1
+
+
+case _ =&#x3E; false
+
+}</textarea>
+					<span class="focus-input100"></span>
+				</div>
+				<span style= "margin-left: 7px;">Symbolic VM mode. Solving depth, where 30 is maximum.</span>
+				<span style= "margin-right: 6px; float: right;">Regular VM mode. Tx data ordered as declared in contract.</span>
+				<div class="container-contact100-form-btn">
+				<div class="wrap-input100 validate-input" style="width: 250px; margin-right: 20px; height: 60px;">				
+					<input id="stp" class="input100" type="text" name="steps" value="7" placeholder="Depth. For example 10. 30 max.">
+					<span class="focus-input100"></span>
+				</div>
+					<button type="button" class="contact100-form-btn" onclick="call(1);">
+						Solve
+					</button>
+				<div class="wrap-input100 validate-input" style="width: 250px; margin-left: 200px; height: 60px;">				
+					<input id="tdata" class="input100" type="text" name="tdata" value="1,0,1,0" placeholder="Tx data. Example: 1,2,3,4">
+					<span class="focus-input100"></span>
+				</div>
+					<button type="button" class="contact100-form-btn" style= "margin-left: 20px;"  onclick="call(2);">
+						Run TX
+					</button>
+
+				</div>				
+			</form>
+			<div id="steps">
+			</div>
+		</div>
+<div class="wrap-contact100" style="position: absolute; left: 1110px; top: 0px; width: 420px; height: 660px; padding-top: 5px;">
+Hyperbox is a symbolic execution virtual virtual machine for Waves RIDE smart-contracts, based on php, python and Z3Prover.<br/>
+Architecture description in <a style= "font-size: 20px; font-weight: bold;" href="https://habr.com/ru/post/450016/">Habr.com article</a><br/><br/>
+
+It mainly intended for formal verification and allows to find all existing vulnerabilities.<br/><br/>
+Hyperbox implements modern and powerful fully automatic multi-transactional search.
+For example, multi-transactional analysis support appeared in Mythril just recently: <br/> 
+<a style= "font-size: 20px; font-weight: bold;" href="https://medium.com/consensys-diligence/the-tech-behind-mythx-smart-contract-security-analysis-32c849aedaef">Mythirl update on Medium</a>
+<br/><br/>
+
+Regular virtual machine is just a special case of symbolic VM, like cube is a special case of tesseract with 1 zero dimension.
+So Hyperbox can also be used as IDE for development and testing.<br/><br/>
+Current version is 0.1, so syntax limited with <br/> = + - * / % == != < <= > >= && ||<br/><br/>
+
+Created by Svyatoslav Yakimov. <br/>Telegramm: <a style= "font-size: 20px; font-weight: bold;" href="https://telegram.me/scp1001" class="url">scp1001</a>
+<br/>
+Waves donation adress (Current balance: 0) 3P5gNvDVRgRme8tVqtCaJzmSUSkjypr7cWe 
+<br/>
+
+</div>
+		
+</body>
+</html>
